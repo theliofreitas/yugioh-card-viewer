@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 import CardItem from '../components/CardItem';
 
