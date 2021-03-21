@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import ShadowView from 'react-native-simple-shadow-view';
 
 import CardItem from '../components/CardItem';
 
@@ -17,20 +18,22 @@ const HomeScreen = () => {
     <SafeAreaView>
       <StatusBar backgroundColor="#0E0E0E" />
 
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.inputSearch}
-          placeholder="Search for cards..."
-        />
-        <TouchableOpacity>
-          <Icon
-            style={styles.iconSearch}
-            name="search1"
-            size={18}
-            color="#7C7C7C"
+      <ShadowView style={styles.inputShadow}>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.inputSearch}
+            placeholder="Search for cards..."
           />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity>
+            <Icon
+              style={styles.iconSearch}
+              name="search1"
+              size={18}
+              color="#7C7C7C"
+            />
+          </TouchableOpacity>
+        </View>
+      </ShadowView>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <CardItem />

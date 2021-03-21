@@ -1,9 +1,10 @@
 import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import ShadowView from 'react-native-simple-shadow-view';
 
 const CardItem = () => {
   return (
-    <View>
+    <ShadowView style={styles.cardShadow}>
       <TouchableOpacity style={styles.container}>
         <View style={styles.imageWrapper}>
           <Image
@@ -34,7 +35,7 @@ const CardItem = () => {
           </View>
         </View>
       </TouchableOpacity>
-    </View>
+    </ShadowView>
   );
 };
 
