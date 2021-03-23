@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
+  FlatList,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   TextInput,
@@ -11,17 +11,94 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import ShadowView from 'react-native-simple-shadow-view';
 
+import api from '../services/api';
+
 import CardItem from '../components/CardItem';
 
 const HomeScreen = () => {
+  const [cardItems, setCardItems] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('Six Samurai');
+
+  const flatListRef = useRef();
+
+  function handleCardItemResult(cardItem) {
+    const newCardItem = {
+      id: cardItem.id,
+      name: cardItem.name,
+      atk: cardItem.atk,
+      def: cardItem.def,
+      level: cardItem.level,
+      race: cardItem.race,
+      attribute: cardItem.attribute,
+      image: cardItem.card_images[0].image_url_small,
+    };
+
+    return newCardItem;
+  }
+
+  function handleSearch() {
+    setSearchTerm(searchInput);
+  }
+
+  function handleEndReached() {
+    console.log('End reached');
+    // ... Load more card items
+  }
+
+  useEffect(() => {
+    api
+      .get('/cardinfo.php', {
+        params: {
+          fname: searchTerm,
+          num: 18,
+          offset: 0,
+        },
+      })
+      .then(function (response) {
+        const result = response.data;
+        const data = result.data;
+        const meta = result.meta;
+
+        const cardItemsResult = data.map(handleCardItemResult);
+
+        setCardItems(cardItemsResult);
+
+        // Scroll to top
+        flatListRef.current.scrollToOffset({
+          animated: true,
+          offset: 0,
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, [searchTerm]);
+
+  const renderItem = ({item}) => (
+    <CardItem
+      id={item.id}
+      name={item.name}
+      atk={item.atk}
+      def={item.def}
+      level={item.level}
+      race={item.race}
+      attribute={item.attribute}
+      image={item.image}
+    />
+  );
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#0E0E0E" />
 
       <ShadowView style={styles.inputShadow}>
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.inputSearch}
+            value={searchInput}
+            onChangeText={search => setSearchInput(search)}
+            onSubmitEditing={handleSearch}
             placeholder="Search for cards..."
           />
           <TouchableOpacity>
@@ -35,19 +112,15 @@ const HomeScreen = () => {
         </View>
       </ShadowView>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-      </ScrollView>
+      <FlatList
+        ref={flatListRef}
+        data={cardItems}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
+        onEndReachedThreshold={0.1}
+        onEndReached={handleEndReached}
+      />
     </SafeAreaView>
   );
 };

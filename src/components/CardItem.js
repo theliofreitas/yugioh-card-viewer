@@ -2,7 +2,7 @@ import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ShadowView from 'react-native-simple-shadow-view';
 
-const CardItem = () => {
+const CardItem = ({id, name, atk, def, level, race, attribute, image}) => {
   return (
     <ShadowView style={styles.cardShadow}>
       <TouchableOpacity style={styles.container}>
@@ -10,8 +10,7 @@ const CardItem = () => {
           <Image
             style={styles.cardImage}
             source={{
-              // eslint-disable-next-line prettier/prettier
-              uri: 'https://storage.googleapis.com/ygoprodeck.com/pics/10000020.jpg',
+              uri: image,
               width: 61,
               height: 86,
             }}
@@ -20,18 +19,24 @@ const CardItem = () => {
 
         <View style={styles.cardInfoWrapper}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardName}>Slifer the Sky Dragon</Text>
-            <Text style={styles.cardLevel}>Lv. 10</Text>
+            <Text style={styles.cardName} numberOfLines={1}>
+              {name}
+            </Text>
+            {level && <Text style={styles.cardLevel}>Lv. {level}</Text>}
           </View>
 
           <View style={styles.cardAttributes}>
-            <Text style={styles.cardElement}>Divine</Text>
-            <Text style={styles.cardRace}>Dragon</Text>
+            {attribute && <Text style={styles.cardElement}>{attribute}</Text>}
+            <Text style={styles.cardRace}>{race}</Text>
           </View>
 
           <View style={styles.cardFooter}>
-            <Text style={styles.cardAtkDef}>ATK: 3000</Text>
-            <Text style={styles.cardAtkDef}>DEF: 2500</Text>
+            {atk !== undefined && (
+              <Text style={styles.cardAtkDef}>ATK: {atk}</Text>
+            )}
+            {def !== undefined && (
+              <Text style={styles.cardAtkDef}>DEF: {def}</Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -79,6 +84,7 @@ const styles = StyleSheet.create({
     fontFamily: 'SquadaOne-Regular',
     fontSize: 18,
     color: '#454545',
+    flex: 1,
   },
   cardLevel: {
     fontFamily: 'SquadaOne-Regular',
@@ -88,6 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: '#FCC65D',
     borderRadius: 9,
+    marginLeft: 4,
   },
   cardElement: {
     fontFamily: 'SquadaOne-Regular',
@@ -104,7 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#454545',
     paddingVertical: 3,
-    paddingHorizontal: 5,
   },
   cardAtkDef: {
     fontFamily: 'SquadaOne-Regular',

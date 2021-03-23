@@ -14,7 +14,11 @@ function Routes() {
         component={LoginScreen}
         options={{headerShown: false}}
       />
-      <Stack.Screen name="HomeScreen" component={HomeScreen} options={{}} />
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 }
