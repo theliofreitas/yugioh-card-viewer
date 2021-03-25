@@ -3,7 +3,6 @@ import {
   FlatList,
   SafeAreaView,
   StatusBar,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
@@ -11,16 +10,63 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import ShadowView from 'react-native-simple-shadow-view';
 
-import api from '../services/api';
+import api from '../../services/api';
 
-import CardItem from '../components/CardItem';
+import CardItem from '../../components/CardItem';
+import { styles } from './styles';
 
 const HomeScreen = () => {
-  const [cardItems, setCardItems] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('Six Samurai');
+  const [cardItems, setCardItems] = useState([]);
+  const [nextPageOffset, setNextPageOffset] = useState(0);
+  const [rowsRemaining, setRowsRemaining] = useState();
 
-  const flatListRef = useRef();
+  function onSearch() {
+    setNextPageOffset(0);
+    setSearchTerm(searchInput);
+  }
+
+  function onEndReached() {
+    console.log('End reached');
+
+    if (!rowsRemaining) return;
+
+    const params = {
+      params: {
+        fname: searchTerm,
+        num: 18,
+        offset: nextPageOffset,
+      },
+    };
+
+    api
+      .get('/cardinfo.php', params)
+      .then(function (response) {
+        listNextPageResults(response);
+      })
+      .catch(function (error) {
+        console.log(error.response);
+        handleErrorResult();
+      });
+  }
+
+  function handleSearchResult(response) {
+    const meta = response.meta;
+    const data = response.data;
+
+    meta.next_page_offset
+      ? setNextPageOffset(meta.next_page_offset)
+      : setNextPageOffset(0);
+
+    setRowsRemaining(meta.rows_remaining);
+
+    return data.map(handleCardItemResult);
+  }
+
+  function handleErrorResult(response) {
+    // TODO
+  }
 
   function handleCardItemResult(cardItem) {
     const newCardItem = {
@@ -37,41 +83,44 @@ const HomeScreen = () => {
     return newCardItem;
   }
 
-  function handleSearch() {
-    setSearchTerm(searchInput);
+  function listNewSearchResults(response) {
+    const cardItemsResult = handleSearchResult(response.data);
+
+    setCardItems(cardItemsResult);
+
+    scrollToTop();
   }
 
-  function handleEndReached() {
-    console.log('End reached');
-    // ... Load more card items
+  function listNextPageResults(response) {
+    const cardItemsResult = handleSearchResult(response.data);
+
+    setCardItems([...cardItems, ...cardItemsResult]);
+  }
+
+  function scrollToTop() {
+    flatListRef.current.scrollToOffset({
+      animated: true,
+      offset: 0,
+    });
   }
 
   useEffect(() => {
+    const params = {
+      params: {
+        fname: searchTerm,
+        num: 18,
+        offset: nextPageOffset,
+      },
+    };
+
     api
-      .get('/cardinfo.php', {
-        params: {
-          fname: searchTerm,
-          num: 18,
-          offset: 0,
-        },
-      })
+      .get('/cardinfo.php', params)
       .then(function (response) {
-        const result = response.data;
-        const data = result.data;
-        const meta = result.meta;
-
-        const cardItemsResult = data.map(handleCardItemResult);
-
-        setCardItems(cardItemsResult);
-
-        // Scroll to top
-        flatListRef.current.scrollToOffset({
-          animated: true,
-          offset: 0,
-        });
+        listNewSearchResults(response);
       })
       .catch(function (error) {
-        console.log(error);
+        console.log(error.response);
+        handleErrorResult(error.response);
       });
   }, [searchTerm]);
 
@@ -88,6 +137,8 @@ const HomeScreen = () => {
     />
   );
 
+  const flatListRef = useRef();
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#0E0E0E" />
@@ -98,7 +149,7 @@ const HomeScreen = () => {
             style={styles.inputSearch}
             value={searchInput}
             onChangeText={search => setSearchInput(search)}
-            onSubmitEditing={handleSearch}
+            onSubmitEditing={onSearch}
             placeholder="Search for cards..."
           />
           <TouchableOpacity>
@@ -118,50 +169,11 @@ const HomeScreen = () => {
         renderItem={renderItem}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.1}
-        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.3}
+        onEndReached={onEndReached}
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6F6F6',
-  },
-  inputShadow: {
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    shadowColor: 'rgba(128, 128, 128, 0.25)',
-    backgroundColor: 'rgba(128, 128, 128, 0.25)',
-    borderRadius: 28,
-    shadowOffset: { width: 3, height: 3 },
-    marginHorizontal: 15,
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 28,
-  },
-  inputSearch: {
-    backgroundColor: '#FFF',
-    fontFamily: 'SquadaOne-Regular',
-    fontSize: 17,
-    color: '#7C7C7C',
-    height: 45,
-    paddingLeft: 15,
-    borderRadius: 28,
-    flex: 1,
-  },
-  iconSearch: {
-    padding: 10,
-    marginRight: 10,
-  },
-});
 
 export default HomeScreen;
