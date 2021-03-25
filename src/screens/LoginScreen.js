@@ -9,15 +9,14 @@ import {
 } from 'react-native';
 
 import ButtonLogin from '../components/ButtonLogin';
+import SplashImage from '../assets/img/splash-screen.jpg';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#0E0E0E" />
 
-      <ImageBackground
-        style={styles.backgroundImage}
-        source={require('../../assets/img/splash-screen.jpg')}>
+      <ImageBackground style={styles.backgroundImage} source={SplashImage}>
         <View style={styles.overlay}>
           <Text style={styles.title}>Yu-Gi-Oh!</Text>
           <Text style={styles.subtitle}>card viewer</Text>
@@ -59,7 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     color: '#FFCE4F',
     textShadowColor: '#CF8630',
-    textShadowOffset: {width: 5, height: 6},
+    textShadowOffset: { width: 5, height: 6 },
     textShadowRadius: 30,
   },
   subtitle: {

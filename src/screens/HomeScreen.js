@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -75,7 +75,7 @@ const HomeScreen = () => {
       });
   }, [searchTerm]);
 
-  const renderItem = ({item}) => (
+  const renderItem = ({ item }) => (
     <CardItem
       id={item.id}
       name={item.name}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(128, 128, 128, 0.25)',
     backgroundColor: 'rgba(128, 128, 128, 0.25)',
     borderRadius: 28,
-    shadowOffset: {width: 3, height: 3},
+    shadowOffset: { width: 3, height: 3 },
     marginHorizontal: 15,
     marginTop: 15,
     marginBottom: 10,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
     borderRadius: 28,
   },
   inputSearch: {
