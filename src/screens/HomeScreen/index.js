@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import ShadowView from 'react-native-simple-shadow-view';
 
-import api from '../../services/api';
+import { getCards } from '../../services/api';
 
 import CardItem from '../../components/CardItem';
 import { styles } from './styles';
@@ -22,6 +22,29 @@ const HomeScreen = () => {
   const [nextPageOffset, setNextPageOffset] = useState(0);
   const [rowsRemaining, setRowsRemaining] = useState();
 
+  async function listNewSearchResults() {
+    const response = await getCards(searchTerm, nextPageOffset);
+
+    if (response.status === 200) {
+      const cardItemsResult = handleSearchResult(response.data);
+      setCardItems(cardItemsResult);
+      scrollToTop();
+    } else {
+      handleErrorResult(response);
+    }
+  }
+
+  async function listNextPageResults() {
+    const response = await getCards(searchTerm, nextPageOffset);
+
+    if (response.status === 200) {
+      const cardItemsResult = handleSearchResult(response.data);
+      setCardItems([...cardItems, ...cardItemsResult]);
+    } else {
+      handleErrorResult(response);
+    }
+  }
+
   function onSearch() {
     setNextPageOffset(0);
     setSearchTerm(searchInput);
@@ -32,23 +55,7 @@ const HomeScreen = () => {
 
     if (!rowsRemaining) return;
 
-    const params = {
-      params: {
-        fname: searchTerm,
-        num: 18,
-        offset: nextPageOffset,
-      },
-    };
-
-    api
-      .get('/cardinfo.php', params)
-      .then(function (response) {
-        listNextPageResults(response);
-      })
-      .catch(function (error) {
-        console.log(error.response);
-        handleErrorResult();
-      });
+    listNextPageResults();
   }
 
   function handleSearchResult(response) {
@@ -62,10 +69,6 @@ const HomeScreen = () => {
     setRowsRemaining(meta.rows_remaining);
 
     return data.map(handleCardItemResult);
-  }
-
-  function handleErrorResult(response) {
-    // TODO
   }
 
   function handleCardItemResult(cardItem) {
@@ -83,18 +86,9 @@ const HomeScreen = () => {
     return newCardItem;
   }
 
-  function listNewSearchResults(response) {
-    const cardItemsResult = handleSearchResult(response.data);
-
-    setCardItems(cardItemsResult);
-
-    scrollToTop();
-  }
-
-  function listNextPageResults(response) {
-    const cardItemsResult = handleSearchResult(response.data);
-
-    setCardItems([...cardItems, ...cardItemsResult]);
+  function handleErrorResult(error) {
+    // TODO
+    console.log(error.data);
   }
 
   function scrollToTop() {
@@ -105,23 +99,7 @@ const HomeScreen = () => {
   }
 
   useEffect(() => {
-    const params = {
-      params: {
-        fname: searchTerm,
-        num: 18,
-        offset: nextPageOffset,
-      },
-    };
-
-    api
-      .get('/cardinfo.php', params)
-      .then(function (response) {
-        listNewSearchResults(response);
-      })
-      .catch(function (error) {
-        console.log(error.response);
-        handleErrorResult(error.response);
-      });
+    listNewSearchResults();
   }, [searchTerm]);
 
   const renderItem = ({ item }) => (
