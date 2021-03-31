@@ -22,5 +22,23 @@ async function getCards(searchTerm, nextPageOffset) {
   }
 }
 
+// GET the details of a card
+async function getCardDetails(name) {
+  const params = {
+    params: {
+      name: name,
+      num: 1,
+      offset: 0,
+    },
+  };
+
+  try {
+    const response = await api.get('/cardinfo.php', params);
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+}
+
+export { getCards, getCardDetails };
 export default api;
-export { getCards };

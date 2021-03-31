@@ -10,10 +10,9 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import ShadowView from 'react-native-simple-shadow-view';
 
-import { getCards } from '../../services/api';
-
-import CardItem from '../../components/CardItem';
 import { styles } from './styles';
+import { getCards } from '../../services/api';
+import CardItem from '../../components/CardItem';
 
 const HomeScreen = () => {
   const [searchInput, setSearchInput] = useState('');
