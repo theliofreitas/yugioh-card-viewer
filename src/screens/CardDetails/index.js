@@ -5,12 +5,13 @@ import { styles } from './styles';
 import { getCardDetails } from '../../services/api';
 import CardImages from '../../components/CardImages';
 
-const CardDetailsScreen = () => {
+const CardDetailsScreen = ({ route }) => {
+  const { cardName } = route.params;
   const [cardImages, setCardImages] = useState([]);
   const [cardActive, setCardActive] = useState({});
 
   async function requestCardDetails() {
-    const response = await getCardDetails('Dark Magician');
+    const response = await getCardDetails(cardName);
 
     if (response.status === 200) {
       const cardImagesResult = handleSearchResult(response.data);

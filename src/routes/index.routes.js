@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 
 function Routes() {
   return (
-    <Stack.Navigator initialRouteName="CardDetailsScreen">
+    <Stack.Navigator initialRouteName="LoginScreen">
       <Stack.Screen
         name="LoginScreen"
         component={LoginScreen}
@@ -23,7 +23,7 @@ function Routes() {
       <Stack.Screen
         name="CardDetailsScreen"
         component={CardDetailsScreen}
-        options={{ headerShown: true }}
+        options={{ headerShown: true, headerTitle: 'Details' }}
       />
     </Stack.Navigator>
   );

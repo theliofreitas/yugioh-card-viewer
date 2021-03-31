@@ -4,11 +4,21 @@ import ShadowView from 'react-native-simple-shadow-view';
 
 import { styles } from './styles';
 import { cardAttributeColors } from '../../styles/colors';
+import { useNavigation } from '@react-navigation/native';
 
 const CardItem = ({ id, name, atk, def, level, race, attribute, image }) => {
+  const navigation = useNavigation();
+
+  function viewCardDetails(cardName) {
+    navigation.navigate('CardDetailsScreen', {
+      cardName: name,
+    });
+  }
   return (
     <ShadowView style={styles.cardShadow}>
-      <TouchableOpacity style={styles.container}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => viewCardDetails(name)}>
         <Image
           style={styles.cardImage}
           source={{
