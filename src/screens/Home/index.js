@@ -3,6 +3,7 @@ import {
   FlatList,
   SafeAreaView,
   StatusBar,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -16,16 +17,18 @@ import CardItem from '../../components/CardItem';
 
 const HomeScreen = () => {
   const [searchInput, setSearchInput] = useState('');
-  const [searchTerm, setSearchTerm] = useState('Six Samurai');
+  const [searchTerm, setSearchTerm] = useState('Dark Magician');
   const [cardItems, setCardItems] = useState([]);
   const [nextPageOffset, setNextPageOffset] = useState(0);
   const [rowsRemaining, setRowsRemaining] = useState();
+  const [cardsNotFound, setCardsNotFound] = useState(false);
 
   async function listNewSearchResults() {
     const response = await getCards(searchTerm, nextPageOffset);
 
     if (response.status === 200) {
       const cardItemsResult = handleSearchResult(response.data);
+      setCardsNotFound(false);
       setCardItems(cardItemsResult);
       scrollToTop();
     } else {
@@ -50,7 +53,7 @@ const HomeScreen = () => {
   }
 
   function onEndReached() {
-    console.log('End reached');
+    // console.log('End reached');
 
     if (!rowsRemaining) return;
 
@@ -86,35 +89,50 @@ const HomeScreen = () => {
   }
 
   function handleErrorResult(error) {
-    // TODO
+    setCardsNotFound(true);
+    setCardItems([]);
     console.log(error.data);
   }
 
   function scrollToTop() {
-    flatListRef.current.scrollToOffset({
-      animated: true,
-      offset: 0,
-    });
+    if (flatListRef.current !== undefined) {
+      flatListRef.current.scrollToOffset({
+        animated: true,
+        offset: 0,
+      });
+    }
   }
 
   useEffect(() => {
     listNewSearchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  const renderItem = ({ item }) => (
-    <CardItem
-      id={item.id}
-      name={item.name}
-      atk={item.atk}
-      def={item.def}
-      level={item.level}
-      race={item.race}
-      attribute={item.attribute}
-      image={item.image}
-    />
-  );
-
   const flatListRef = useRef();
+  const ITEM_HEIGHT = 170;
+
+  const renderItem = ({ item }) => {
+    return (
+      <CardItem
+        id={item.id}
+        name={item.name}
+        atk={item.atk}
+        def={item.def}
+        level={item.level}
+        race={item.race}
+        attribute={item.attribute}
+        image={item.image}
+      />
+    );
+  };
+
+  const _getItemLayout = (data, index) => {
+    return {
+      length: ITEM_HEIGHT,
+      offset: ITEM_HEIGHT * index,
+      index: index,
+    };
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -129,7 +147,7 @@ const HomeScreen = () => {
             onSubmitEditing={onSearch}
             placeholder="Search for cards..."
           />
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onSearch}>
             <Icon
               style={styles.iconSearch}
               name="search1"
@@ -140,15 +158,26 @@ const HomeScreen = () => {
         </View>
       </ShadowView>
 
-      <FlatList
-        ref={flatListRef}
-        data={cardItems}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        onEndReachedThreshold={0.3}
-        onEndReached={onEndReached}
-      />
+      {!cardsNotFound && (
+        <FlatList
+          ref={flatListRef}
+          data={cardItems}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.5}
+          onEndReached={onEndReached}
+          getItemLayout={_getItemLayout}
+          maxToRenderPerBatch={10}
+          initialNumToRender={10}
+        />
+      )}
+
+      {cardsNotFound && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorMessage}>No cards were found... 😕</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

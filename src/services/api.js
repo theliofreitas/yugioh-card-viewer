@@ -9,7 +9,7 @@ async function getCards(searchTerm, nextPageOffset) {
   const params = {
     params: {
       fname: searchTerm,
-      num: 18,
+      num: 40,
       offset: nextPageOffset,
     },
   };

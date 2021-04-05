@@ -39,4 +39,15 @@ export const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
   },
+  errorContainer: {
+    margin: 20,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorMessage: {
+    fontFamily: 'SquadaOne-Regular',
+    color: colors.textPrimary,
+    fontSize: 22,
+  },
 });

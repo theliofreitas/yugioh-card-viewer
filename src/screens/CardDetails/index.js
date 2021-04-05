@@ -50,6 +50,7 @@ const CardDetailsScreen = ({ route }) => {
 
   useEffect(() => {
     requestCardDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

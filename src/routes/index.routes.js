@@ -23,7 +23,21 @@ function Routes() {
       <Stack.Screen
         name="CardDetailsScreen"
         component={CardDetailsScreen}
-        options={{ headerShown: true, headerTitle: 'Details' }}
+        options={({ route }) => ({
+          headerShown: true,
+          headerTitle: route.params.cardName,
+          headerStyle: {
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomColor: '#d9d9d9',
+            borderBottomWidth: 1,
+          },
+          headerTitleStyle: {
+            fontFamily: 'SquadaOne-Regular',
+            fontSize: 24,
+          },
+          headerTitleAlign: 'center',
+        })}
       />
     </Stack.Navigator>
   );
