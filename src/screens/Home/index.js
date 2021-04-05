@@ -1,22 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  FlatList,
-  SafeAreaView,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign';
-import ShadowView from 'react-native-simple-shadow-view';
+import { SafeAreaView, StatusBar, Text, View } from 'react-native';
 
 import { styles } from './styles';
 import { getCards } from '../../services/api';
-import CardItem from '../../components/CardItem';
+import SearchInput from '../../components/SearchInput';
+import CardList from '../../components/CardList';
 
 const HomeScreen = () => {
-  const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('Dark Magician');
   const [cardItems, setCardItems] = useState([]);
   const [nextPageOffset, setNextPageOffset] = useState(0);
@@ -47,9 +37,9 @@ const HomeScreen = () => {
     }
   }
 
-  function onSearch() {
+  function onSearch(text) {
     setNextPageOffset(0);
-    setSearchTerm(searchInput);
+    setSearchTerm(text);
   }
 
   function onEndReached() {
@@ -94,9 +84,11 @@ const HomeScreen = () => {
     console.log(error.data);
   }
 
+  const cardListRef = useRef();
+
   function scrollToTop() {
-    if (flatListRef.current !== undefined) {
-      flatListRef.current.scrollToOffset({
+    if (cardListRef.current !== undefined) {
+      cardListRef.current.scrollToOffset({
         animated: true,
         offset: 0,
       });
@@ -108,68 +100,19 @@ const HomeScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  const flatListRef = useRef();
-  const ITEM_HEIGHT = 170;
-
-  const renderItem = ({ item }) => {
-    return (
-      <CardItem
-        id={item.id}
-        name={item.name}
-        atk={item.atk}
-        def={item.def}
-        level={item.level}
-        race={item.race}
-        attribute={item.attribute}
-        image={item.image}
-      />
-    );
-  };
-
-  const _getItemLayout = (data, index) => {
-    return {
-      length: ITEM_HEIGHT,
-      offset: ITEM_HEIGHT * index,
-      index: index,
-    };
-  };
+  console.log('Rendering...');
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#0E0E0E" />
 
-      <ShadowView style={styles.inputShadow}>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.inputSearch}
-            value={searchInput}
-            onChangeText={search => setSearchInput(search)}
-            onSubmitEditing={onSearch}
-            placeholder="Search for cards..."
-          />
-          <TouchableOpacity onPress={onSearch}>
-            <Icon
-              style={styles.iconSearch}
-              name="search1"
-              size={18}
-              color="#7C7C7C"
-            />
-          </TouchableOpacity>
-        </View>
-      </ShadowView>
+      <SearchInput onPress={onSearch} placeholder="Search for cards..." />
 
       {!cardsNotFound && (
-        <FlatList
-          ref={flatListRef}
-          data={cardItems}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.5}
+        <CardList
+          ref={cardListRef}
+          cardItems={cardItems}
           onEndReached={onEndReached}
-          getItemLayout={_getItemLayout}
-          maxToRenderPerBatch={10}
-          initialNumToRender={10}
         />
       )}
 
