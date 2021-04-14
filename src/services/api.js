@@ -6,10 +6,12 @@ const api = axios.create({
 
 // GET a list of cards
 async function getCards(searchTerm, nextPageOffset) {
+  console.log('Request API with an Offset of: ' + nextPageOffset);
+
   const params = {
     params: {
       fname: searchTerm,
-      num: 40,
+      num: 60,
       offset: nextPageOffset,
     },
   };

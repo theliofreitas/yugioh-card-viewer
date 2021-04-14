@@ -1,9 +1,13 @@
 import React from 'react';
 import { FlatList } from 'react-native';
+import { useSelector } from 'react-redux';
+
 import CardItem from '../CardItem';
 
-const CardList = ({ cardItems, onEndReached }, ref) => {
-  const ITEM_HEIGHT = 170;
+const CardList = ({ onEndReached }, ref) => {
+  const cardItems = useSelector(state => state.cardList);
+
+  const ITEM_HEIGHT = 126;
 
   const renderItem = ({ item }) => {
     return (
@@ -35,11 +39,12 @@ const CardList = ({ cardItems, onEndReached }, ref) => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       showsVerticalScrollIndicator={false}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={0}
       onEndReached={onEndReached}
       getItemLayout={_getItemLayout}
-      maxToRenderPerBatch={10}
-      initialNumToRender={10}
+      maxToRenderPerBatch={12}
+      initialNumToRender={12}
+      removeClippedSubviews={true}
     />
   );
 };

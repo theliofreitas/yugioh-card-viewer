@@ -6,20 +6,27 @@ import { getCards } from '../../services/api';
 import SearchInput from '../../components/SearchInput';
 import CardList from '../../components/CardList';
 
+import { newSearch, nextPage, updateOffset } from '../../actions';
+import { useDispatch, useSelector } from 'react-redux';
+
 const HomeScreen = () => {
-  const [searchTerm, setSearchTerm] = useState('Dark Magician');
-  const [cardItems, setCardItems] = useState([]);
-  const [nextPageOffset, setNextPageOffset] = useState(0);
-  const [rowsRemaining, setRowsRemaining] = useState();
+  const [searchTerm, setSearchTerm] = useState('Dragon');
   const [cardsNotFound, setCardsNotFound] = useState(false);
+  const cardListOffset = useSelector(state => state.cardListOffset);
+  const dispatch = useDispatch();
 
   async function listNewSearchResults() {
-    const response = await getCards(searchTerm, nextPageOffset);
+    const response = await getCards(searchTerm, 0);
 
     if (response.status === 200) {
       const cardItemsResult = handleSearchResult(response.data);
-      setCardsNotFound(false);
-      setCardItems(cardItemsResult);
+
+      if (cardsNotFound) {
+        setCardsNotFound(false);
+      }
+
+      dispatch(newSearch(cardItemsResult));
+
       scrollToTop();
     } else {
       handleErrorResult(response);
@@ -27,25 +34,27 @@ const HomeScreen = () => {
   }
 
   async function listNextPageResults() {
-    const response = await getCards(searchTerm, nextPageOffset);
+    console.log(
+      'Call nextPageResults with an offset of: ' + cardListOffset.nextPage,
+    );
+
+    const response = await getCards(searchTerm, cardListOffset.nextPage);
 
     if (response.status === 200) {
       const cardItemsResult = handleSearchResult(response.data);
-      setCardItems([...cardItems, ...cardItemsResult]);
+
+      dispatch(nextPage(cardItemsResult));
     } else {
       handleErrorResult(response);
     }
   }
 
   function onSearch(text) {
-    setNextPageOffset(0);
     setSearchTerm(text);
   }
 
   function onEndReached() {
-    // console.log('End reached');
-
-    if (!rowsRemaining) return;
+    if (!cardListOffset.rowsRemaining) return;
 
     listNextPageResults();
   }
@@ -54,11 +63,15 @@ const HomeScreen = () => {
     const meta = response.meta;
     const data = response.data;
 
-    meta.next_page_offset
-      ? setNextPageOffset(meta.next_page_offset)
-      : setNextPageOffset(0);
+    const nextPageOffset = meta.next_page_offset ? meta.next_page_offset : 0;
+    const rowsRemaining = meta.rows_remaining;
 
-    setRowsRemaining(meta.rows_remaining);
+    const offset = {
+      nextPage: nextPageOffset,
+      rowsRemaining: rowsRemaining,
+    };
+
+    dispatch(updateOffset(offset));
 
     return data.map(handleCardItemResult);
   }
@@ -80,7 +93,6 @@ const HomeScreen = () => {
 
   function handleErrorResult(error) {
     setCardsNotFound(true);
-    setCardItems([]);
     console.log(error.data);
   }
 
@@ -100,8 +112,6 @@ const HomeScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  console.log('Rendering...');
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#0E0E0E" />
@@ -109,11 +119,7 @@ const HomeScreen = () => {
       <SearchInput onPress={onSearch} placeholder="Search for cards..." />
 
       {!cardsNotFound && (
-        <CardList
-          ref={cardListRef}
-          cardItems={cardItems}
-          onEndReached={onEndReached}
-        />
+        <CardList ref={cardListRef} onEndReached={onEndReached} />
       )}
 
       {cardsNotFound && (

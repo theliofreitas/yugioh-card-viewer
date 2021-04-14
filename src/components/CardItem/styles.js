@@ -4,6 +4,7 @@ import { colors } from '../../styles/colors';
 
 export const styles = StyleSheet.create({
   cardShadow: {
+    elevation: 1,
     shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowColor: 'rgba(183, 183, 183, 0.10)',

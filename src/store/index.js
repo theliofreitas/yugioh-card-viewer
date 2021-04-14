@@ -1,4 +1,4 @@
 import { createStore } from 'redux';
-import cardListReducer from '../reducers/cardList';
+import allReducers from '../reducers';
 
-export const store = createStore(cardListReducer);
+export const store = createStore(allReducers);
