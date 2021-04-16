@@ -3,76 +3,21 @@ import { FlatList, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styles } from './styles';
-import { getCards } from '../../services/api';
-import { newSearch, nextPage } from '../../actions';
+import { getCards } from '../../store/actions/cards';
 import CardItem from '../CardItem';
 
 const CardList = ({ searchTerm }) => {
-  const [cardsNotFound, setCardsNotFound] = useState(false);
-  const { data: cardItems, offset } = useSelector(state => state.cardList);
+  const { data: cardItems, offset } = useSelector(state => state.cards);
   const dispatch = useDispatch();
+  const [cardsNotFound, setCardsNotFound] = useState(false); //remove
 
-  async function loadCards(shouldRefresh) {
-    if (!shouldRefresh && !offset.rowsRemaining) return;
-
-    const response = await getCards(
-      searchTerm,
-      shouldRefresh ? 0 : offset.nextPage,
-    );
-
-    if (response.status === 200) {
-      const cardItemsResult = handleSearchResult(response.data);
-
-      if (cardsNotFound) {
-        setCardsNotFound(false);
-      }
-
-      if (shouldRefresh) {
-        scrollToTop();
-        dispatch(newSearch(cardItemsResult));
-      } else {
-        dispatch(nextPage(cardItemsResult));
-      }
-    } else {
-      handleErrorResult(response);
+  function loadCards(shouldRefresh) {
+    if (shouldRefresh) {
+      scrollToTop();
+      dispatch(getCards(searchTerm, 0));
+    } else if (offset.rowsRemaining) {
+      dispatch(getCards(searchTerm, offset.nextPage));
     }
-  }
-
-  function handleSearchResult(response) {
-    const meta = response.meta;
-    const data = response.data;
-
-    const nextPageOffset = meta.next_page_offset ? meta.next_page_offset : 0;
-    const rowsRemaining = meta.rows_remaining;
-
-    const offsetData = {
-      nextPage: nextPageOffset,
-      rowsRemaining: rowsRemaining,
-    };
-
-    const cardData = data.map(handleCardItemResult);
-
-    return { data: cardData, offset: offsetData };
-  }
-
-  function handleCardItemResult(cardItem) {
-    const newCardItem = {
-      id: cardItem.id,
-      name: cardItem.name,
-      atk: cardItem.atk,
-      def: cardItem.def,
-      level: cardItem.level,
-      race: cardItem.race,
-      attribute: cardItem.attribute,
-      image: cardItem.card_images[0].image_url_small,
-    };
-
-    return newCardItem;
-  }
-
-  function handleErrorResult(error) {
-    setCardsNotFound(true);
-    console.log(error.data);
   }
 
   const cardListRef = useRef();

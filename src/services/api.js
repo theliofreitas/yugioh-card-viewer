@@ -11,7 +11,7 @@ async function getCards(searchTerm, nextPageOffset) {
   const params = {
     params: {
       fname: searchTerm,
-      num: 50,
+      num: 40,
       offset: nextPageOffset,
     },
   };

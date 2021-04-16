@@ -6,10 +6,13 @@ const initialState = {
   },
 };
 
-const cardListReducer = (state = initialState, action) => {
+const cardsReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'NEW_SEARCH':
-      return action.payload;
+    case 'GET_CARDS':
+      return {
+        data: action.payload.data,
+        offset: action.payload.offset,
+      };
 
     case 'NEXT_PAGE':
       return {
@@ -22,4 +25,4 @@ const cardListReducer = (state = initialState, action) => {
   }
 };
 
-export default cardListReducer;
+export default cardsReducer;
