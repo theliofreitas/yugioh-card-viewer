@@ -7,6 +7,7 @@ import Routes from './routes';
 import { store } from './store';
 
 const App = () => {
+  // store.subscribe(() => console.log(store.getState()));
   return (
     <Provider store={store}>
       <NavigationContainer>
