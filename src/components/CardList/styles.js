@@ -14,4 +14,7 @@ export const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 22,
   },
+  loader: {
+    marginVertical: 30,
+  },
 });

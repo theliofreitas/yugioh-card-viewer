@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import React, { Fragment, useEffect, useRef } from 'react';
+import { FlatList, Text, View, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styles } from './styles';
@@ -7,28 +7,29 @@ import { getCards } from '../../store/actions/cards';
 import CardItem from '../CardItem';
 
 const CardList = ({ searchTerm }) => {
-  const { data: cardItems, offset } = useSelector(state => state.cards);
+  const {
+    data: cardItems,
+    offset,
+    loadingHeader,
+    loadingFooter,
+    error,
+  } = useSelector(state => state.cards);
+
   const dispatch = useDispatch();
-  const [cardsNotFound, setCardsNotFound] = useState(false); //remove
 
   function loadCards(shouldRefresh) {
     if (shouldRefresh) {
-      scrollToTop();
       dispatch(getCards(searchTerm, 0));
+      scrollToTop();
     } else if (offset.rowsRemaining) {
       dispatch(getCards(searchTerm, offset.nextPage));
     }
   }
 
   const cardListRef = useRef();
-  function scrollToTop() {
-    if (cardListRef.current !== undefined) {
-      cardListRef.current.scrollToOffset({
-        animated: true,
-        offset: 0,
-      });
-    }
-  }
+  const scrollToTop = () => {
+    cardListRef.current.scrollToOffset({ animated: true, offset: 0 });
+  };
 
   const ITEM_HEIGHT = 126;
   const _getItemLayout = (data, index) => {
@@ -63,29 +64,45 @@ const CardList = ({ searchTerm }) => {
 
   return (
     <Fragment>
-      {!cardsNotFound && (
-        <FlatList
-          ref={cardListRef}
-          data={cardItems}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          showsVerticalScrollIndicator={false}
-          onEndReachedThreshold={0.1}
-          onEndReached={() => {
-            loadCards();
-          }}
-          getItemLayout={_getItemLayout}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          removeClippedSubviews={true}
-        />
-      )}
-
-      {cardsNotFound && (
+      {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorMessage}>No cards were found... 😕</Text>
         </View>
       )}
+
+      <FlatList
+        ref={cardListRef}
+        data={cardItems}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
+        onEndReachedThreshold={0.1}
+        onEndReached={() => {
+          loadCards();
+        }}
+        ListHeaderComponent={
+          loadingHeader && (
+            <ActivityIndicator
+              style={styles.loader}
+              size="large"
+              color="#b5b5b5"
+            />
+          )
+        }
+        ListFooterComponent={
+          loadingFooter && (
+            <ActivityIndicator
+              style={styles.loader}
+              size="large"
+              color="#b5b5b5"
+            />
+          )
+        }
+        getItemLayout={_getItemLayout}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        removeClippedSubviews={true}
+      />
     </Fragment>
   );
 };

@@ -40,8 +40,10 @@ function* asyncGetCards({ payload }) {
     const cardItemsResult = handleSearchResult(response.data);
 
     payload.offset
-      ? yield put({ type: 'NEXT_PAGE', payload: cardItemsResult })
-      : yield put({ type: 'GET_CARDS', payload: cardItemsResult });
+      ? yield put({ type: 'GET_NEXT_PAGE', payload: cardItemsResult })
+      : yield put({ type: 'SUCCESS_GET_CARDS', payload: cardItemsResult });
+  } else {
+    yield put({ type: 'ERROR_GET_CARDS' });
   }
 }
 

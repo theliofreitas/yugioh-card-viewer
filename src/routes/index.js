@@ -36,6 +36,9 @@ function Routes() {
             fontFamily: 'SquadaOne-Regular',
             fontSize: 24,
           },
+          headerTitleContainerStyle: {
+            width: '70%',
+          },
           headerTitleAlign: 'center',
         })}
       />
