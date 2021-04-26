@@ -1,4 +1,4 @@
-package com.yugiohcardviewer;
+package com.mdnt.yugiohcardviewer;
 
 import com.facebook.react.ReactActivity;
 
