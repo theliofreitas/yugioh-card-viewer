@@ -1,11 +1,17 @@
 import React from 'react';
-import { Image, TouchableHighlight, View } from 'react-native';
+import { Image, ScrollView, TouchableHighlight } from 'react-native';
 
 import { styles } from './styles';
 
-const CardImages = ({ cardImagesList, onPress, handler }) => {
+const CardImages = ({ cardImagesList, onPress }) => {
   return (
-    <View style={styles.imagesContainer}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{
+        alignItems: 'flex-end',
+      }}
+      style={styles.imagesContainer}>
       {cardImagesList.map((card, index) => {
         return (
           <TouchableHighlight
@@ -22,7 +28,7 @@ const CardImages = ({ cardImagesList, onPress, handler }) => {
           </TouchableHighlight>
         );
       })}
-    </View>
+    </ScrollView>
   );
 };
 
