@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native';
+import { colors } from '../../styles/colors';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
     padding: 15,
+    justifyContent: 'space-between',
   },
   activeImageContainer: {
     height: '70%',
@@ -12,7 +14,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardImagesContainer: {
-    height: '30%',
-    justifyContent: 'flex-end',
+    // justifyContent: 'flex-end',
+    marginTop: 20,
+  },
+  textLabel: {
+    fontFamily: 'SquadaOne-Regular',
+    fontSize: 18,
+    color: colors.textPrimary,
   },
 });

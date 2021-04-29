@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Image, SafeAreaView, View } from 'react-native';
+import { SafeAreaView, Text, View } from 'react-native';
 
 import { styles } from './styles';
 import { getCardDetails } from '../../services/api';
 import CardImages from '../../components/CardImages';
+import LazyImage from '../../components/LazyImage';
 
 const CardDetailsScreen = ({ route }) => {
   const { cardName } = route.params;
@@ -56,17 +57,14 @@ const CardDetailsScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.activeImageContainer}>
-        <Image
-          source={{
-            uri: cardActive.image_url,
-            width: '100%',
-            height: '100%',
-          }}
-          resizeMode={'contain'}
+        <LazyImage
+          smallSource={{ uri: cardActive.image_url_small }}
+          source={{ uri: cardActive.image_url }}
         />
       </View>
 
       <View style={styles.cardImagesContainer}>
+        <Text style={styles.textLabel}>Card images</Text>
         <CardImages cardImagesList={cardImages} onPress={chooseCard} />
       </View>
     </SafeAreaView>
